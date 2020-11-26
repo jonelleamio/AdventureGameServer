@@ -17,9 +17,20 @@ def getCode(res:str) :
     return str(res).split("[")[1].split("]")[0]
 
 print (getCode(home))
+print (home.content)
+print ("\n\n##################\n\n")
 print (getCode(connexion))
+print (connexion.content)
+print ("\n\n##################\n\n")
 print (getCode(regarder))
+print (regarder.content)
+print ("\n\n##################\n\n")
 print (getCode(deplacement))
+print (deplacement.content)
+print ("\n\n##################\n\n")
 print (getCode(examiner))
+print (examiner.content)
+print ("\n\n##################\n\n")
 print (getCode(taper))
+print (taper.content)
 

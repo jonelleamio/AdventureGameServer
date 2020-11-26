@@ -4,6 +4,8 @@ import 'Item.dart';
 class LifePotion implements Item {
   int life;
 
+  LifePotion(this.life);
+
   @override
   Map isUsedBy(Player p) {
     p.life += life;
@@ -13,5 +15,4 @@ class LifePotion implements Item {
       'totalLife': p.life,
     };
   }
-
 }

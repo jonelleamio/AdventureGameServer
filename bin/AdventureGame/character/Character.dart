@@ -1,10 +1,13 @@
 import 'dart:math';
 
+import '../AdventureGame.dart';
+
 abstract class Character {
   int life;
   int strength;
   int gold;
   String name;
+  AdventureGame game;
   String type;
 
   Character(this.life, this.strength, this.gold, this.name, this.type);

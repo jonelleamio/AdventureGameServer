@@ -30,4 +30,5 @@ class Merchant implements Item {
     var r = Random();
     return bag[r.nextInt(bag.length)];
   }
+
 }

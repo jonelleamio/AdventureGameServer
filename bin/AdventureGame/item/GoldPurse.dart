@@ -4,6 +4,8 @@ import 'Item.dart';
 class GoldPurse implements Item {
   int gold;
 
+  GoldPurse(this.gold);
+
   @override
   Map isUsedBy(Player p) {
     p.gold += gold;
