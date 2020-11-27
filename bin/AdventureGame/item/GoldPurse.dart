@@ -2,9 +2,13 @@ import '../character/Player.dart';
 import 'Item.dart';
 
 class GoldPurse implements Item {
-  int gold;
+  final int gold;
+  final int id;
 
-  GoldPurse(this.gold);
+  @override
+  int get getId => id;
+
+  GoldPurse(this.gold, this.id);
 
   @override
   Map isUsedBy(Player p) {
@@ -15,5 +19,12 @@ class GoldPurse implements Item {
       'totalGold': p.gold,
     };
   }
+
+  @override
+  Map state() => {
+    'description' : '${gold} gold',
+    'guid' : id,
+    'type': 'GOLD PURSE'
+  };
 
 }

@@ -1,25 +1,18 @@
-import '../character/Monster.dart';
+import '../character/Character.dart';
 import '../character/Player.dart';
-import 'UseAction.dart';
+import 'Action.dart';
 
-class AttackAction implements Action {
+class AttackAction implements Action<Character> {
+
   @override
-  Map execute(Player player) {
-    var monsters = player.currentRoom.monsters;
-    var players = player.currentRoom.players;
-
+  Map execute(Player player, c) {
+    return player.attack(c);
   }
 
   @override
-  String getName() {
-    // TODO: implement getName
-    throw UnimplementedError();
-  }
+  bool isPossible(Player player) => !player.isDead();
 
   @override
-  bool isPossible(Player player) {
-    // TODO: implement isPossible
-    throw UnimplementedError();
-  }
+  String getType() => 'attack';
 
 }

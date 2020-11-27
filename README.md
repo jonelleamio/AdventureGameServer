@@ -11,3 +11,7 @@ To test you can run
 ```
 python bin/test_server.dart
 ```
+You can test the game mechanics with
+```
+dart bin/AdventureGame/Main.dart
+```

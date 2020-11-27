@@ -2,9 +2,13 @@ import '../character/Player.dart';
 import 'Item.dart';
 
 class StrengthPotion implements Item {
-  int strength;
+  final int strength;
+  final int id;
 
-  StrengthPotion(this.strength);
+  StrengthPotion(this.strength, this.id);
+
+  @override
+  int get getId => id;
 
   @override
   Map isUsedBy(Player p) {
@@ -15,5 +19,12 @@ class StrengthPotion implements Item {
       'totalStrength': p.strength,
     };
   }
+
+  @override
+  Map state() => {
+    'description' : '${strength} strength',
+    'guid' : id,
+    'type': 'STRENGTH POTION'
+  };
 
 }

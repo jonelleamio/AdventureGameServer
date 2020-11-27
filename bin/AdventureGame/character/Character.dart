@@ -6,11 +6,12 @@ abstract class Character {
   int life;
   int strength;
   int gold;
+  int guid;
   String name;
   AdventureGame game;
   String type;
 
-  Character(this.life, this.strength, this.gold, this.name, this.type);
+  Character(this.life, this.strength, this.gold, this.name, this.guid, this.type);
 
   Map attack(Character c)
   {
@@ -23,8 +24,8 @@ abstract class Character {
       gold += c.gold;
     }
     return {
-      'description': '${name} hits ${c.name} \n'
-          '${c.name} took ${damage} damage \n'
+      'description': '${name} hits ${c.name}, '
+          '${c.name} took ${damage} damage, '
           '${c.name} have ${c.life} life left',
       'type': c.type,
       'life': c.life,
@@ -32,13 +33,9 @@ abstract class Character {
     };
   }
 
-  bool isDead()
-  {
-    return life <= 0;
-  }
+  bool isDead() => life <= 0;
 
-  String die()
-  {
-    return null;
-  }
+  String die() => null;
+
+  Map state();
 }

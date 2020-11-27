@@ -10,16 +10,21 @@ import 'item/StrengthPotion.dart';
 import 'room/Direction.dart';
 import 'room/Room.dart';
 
+/// Contains the whole game
 class AdventureGame {
-  final MAX_ROOM = 100;
+  final MAX_ROOM = 10;
+  final Random r;
+  final List<Direction> directions;
+  // act as id for monster and item
+  int counter = 0;
   List<Player> players;
-  List<Room> dungeon;
-  List<Direction> directions;
   Room startRoom;
-  Random r;
 
-  AdventureGame(){
-    r = Random();
+  AdventureGame():
+    r = Random(),
+    directions = <Direction>[]
+  {
+    players = <Player>[];
     directions.add(Direction.NORTH);
     directions.add(Direction.EAST);
     directions.add(Direction.WEST);
@@ -28,6 +33,7 @@ class AdventureGame {
   }
 
   /// Create rooms and link them together
+  ///
   /// Initialise startRoom
   /// create new room then link it to parent
   /// push new room into queue
@@ -44,6 +50,10 @@ class AdventureGame {
         /// to not overwrite parent link
         for (var newDir in oldDir.removeOpp(directions)) {
           if (nbRoom < MAX_ROOM) {
+            /// by default there will always be 1 room then its random if there will be more
+            if(current.numberOfNeighbours() > 2 && r.nextBool()) {
+              continue;
+            }
             newRoom = createRoom(nbRoom, level, newDir);
             /// two way - allow player to go back
             current.addNeighbours(newRoom, newDir);
@@ -110,10 +120,11 @@ class AdventureGame {
   Room createRoom(int roomNb, level, Direction direction) {
     // a room can have 1 to 3 items and mobs
     final n = r.nextInt(2) + 1;
-    var room = Room('Room${direction}${roomNb}${level}');
+    var room = Room('Room${direction.toShortString()}${roomNb}${level}');
     for(var i = 0; i < n; i++) {
       room.addMonster(createMob(level));
       room.addItem(createItem(level));
+      counter++;
     }
     return room;
   }
@@ -134,7 +145,7 @@ class AdventureGame {
 
     final gold = r.nextInt((500 * level).round());
 
-    return Monster(life, str, gold, 'Monster${lvl}');
+    return Monster(life, str, gold, 'Monster${lvl}', counter);
   }
 
   /// Returns a random Item
@@ -144,16 +155,23 @@ class AdventureGame {
     final value = (40 * lvl) + 10;
     Item item;
     switch(r.nextInt(3)) {
-      case 0 : item = LifePotion(value); break;
-      case 1 : item =  StrengthPotion(value);break;
+      case 0 : item = LifePotion(value, counter); break;
+      case 1 : item =  StrengthPotion(value, counter);break;
       case 2 :
         final cost = (2 * lvl) + 10;
-        var bag = [];
-        bag.add(LifePotion(value));
-        bag.add(StrengthPotion(value));
-        item = Merchant(cost, bag);
+        var bag = <Item>[];
+        bag.add(LifePotion(value, counter));
+        bag.add(StrengthPotion(value, counter));
+        item = Merchant(cost, bag, counter);
         break;
     }
     return item;
+  }
+
+  /// Add new player to the game
+  Map newPlayer(Player p) {
+    players.add(p);
+    p.currentRoom = startRoom;
+    return p.state();
   }
 }

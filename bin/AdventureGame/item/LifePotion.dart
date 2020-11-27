@@ -2,9 +2,13 @@ import '../character/Player.dart';
 import 'Item.dart';
 
 class LifePotion implements Item {
-  int life;
+  final int life;
+  final int id;
 
-  LifePotion(this.life);
+  @override
+  int get getId => id;
+
+  LifePotion(this.life, this.id);
 
   @override
   Map isUsedBy(Player p) {
@@ -15,4 +19,11 @@ class LifePotion implements Item {
       'totalLife': p.life,
     };
   }
+
+  @override
+  Map state() => {
+    'description' : '${life} life',
+    'guid' : id,
+    'type': 'LIFE POTION'
+  };
 }

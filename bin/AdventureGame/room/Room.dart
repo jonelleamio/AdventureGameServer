@@ -1,67 +1,70 @@
+import '../character/Character.dart';
 import '../character/Monster.dart';
 import '../character/Player.dart';
 import '../item/Item.dart';
 import 'Direction.dart';
 
-class Room
-{
-  List<Monster> monsters;
+class Room {
+  final String name;
+  final List<Monster> monsters;
+  final List<Item> items;
+  final Map<Direction, Room> neighbours;
   List<Player> players;
-  List<Item> items;
-  Map<Direction, Room> neighbours;
-  String name;
 
-  Room(String n){
-    name = n;
+  Room(this.name)
+      : monsters = <Monster>[],
+        items = <Item>[],
+        neighbours = <Direction, Room>{},
+        players = <Player>[];
+
+  void addMonster(Monster m) => monsters.add(m);
+
+  void addItem(Item i) => items.add(i);
+
+  void addNeighbours(Room r, Direction d) {
+    if (!neighbours.containsKey(d)) neighbours[d] = r;
   }
 
-  void addMonster(Monster m)
-  {
-    monsters.add(m);
+  Iterable<Direction> getDirection() => neighbours.keys;
+
+  Room getNeighbour(Direction userDirection) => neighbours[userDirection];
+
+  int numberOfNeighbours() => neighbours.length;
+
+  bool isExit() => false;
+
+  List<int> getGuid(List<Character> list) {
+    var guids = <int>[];
+    list.forEach((c) => guids.add(c.guid));
+    return guids;
   }
 
-  void addItem(Item i)
-  {
-    items.add(i);
+  List<int> getGuidEntities() {
+    var entities = getGuid(monsters);
+    if (players.isNotEmpty) entities.addAll(getGuid(players));
+    return entities;
   }
 
-  void addNeighbours(Room r, Direction d)
-  {
-    if (!neighbours.containsKey(d)) {
-      neighbours[d] = r;
+  List<int> getItemsid() {
+    var iID = <int>[];
+    items.forEach((c) => iID.add(c.getId));
+    return iID;
+  }
+
+  List<String> stringDirections() {
+    final directions = getDirection();
+    var result = <String>[];
+    for (var d in directions) {
+      result.add(d.toShortString());
     }
+    return result;
   }
 
-  List<Direction> getDirection()
-  {
-    return neighbours.keys;
-  }
-
-  Room getNeighbour(Direction userDirection)
-  {
-    return neighbours[userDirection];
-  }
-
-  int numberOfNeighbours()
-  {
-    return neighbours.length;
-  }
-
- /* String toString()
-  {
-    return ((((((((("\n#########################\n" + "# You are in ") + this.name) + " #\n") + "#########################\n") + "There are ") + monsters.size()) + " monsters in this place\n") + "There are ") + items.size()) + " items in this place";
-  }
-
-  void displayNeighbours()
-  {
-    Room neighbour;
-    for (Direction direction in this.neighbours.keySet()) {
-      neighbour = neighbours.get(direction);
-      System.out.println("\n***************************************");
-      System.out.println(((("*  " + direction) + " -> ") + neighbour.name) + "                 *");
-      System.out.println(("*  There are " + neighbour.monsters.size()) + " monsters in this place *");
-      System.out.println(("*  There are " + neighbour.items.size()) + " items in this place    *");
-      System.out.println("***************************************");
-    }
-  }*/
+  Map state() => {
+        'description': 'You are in ${name}',
+        'directions': stringDirections(),
+        'totalEntities': players.length + monsters.length,
+        'entities': getGuidEntities(),
+        'items': getItemsid()
+      };
 }

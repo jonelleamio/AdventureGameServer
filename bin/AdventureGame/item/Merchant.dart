@@ -3,11 +3,16 @@ import 'Item.dart';
 import 'dart:math';
 
 class Merchant implements Item {
-  int cost;
-  List<Item> bag;
+  final int cost;
+  final List<Item> bag;
+  final int id;
 
-  Merchant(this.cost, this.bag);
+  Merchant(this.cost, this.bag, this.id);
 
+  @override
+  int get getId => id;
+
+  @override
   Map isUsedBy(Player p)
   {
     if (p.gold >= cost) {
@@ -31,4 +36,10 @@ class Merchant implements Item {
     return bag[r.nextInt(bag.length)];
   }
 
+  @override
+  Map state() => {
+    'description' : 'A merchant selling item at ${cost} gold',
+    'guid' : id,
+    'type': 'MERCHANT'
+  };
 }

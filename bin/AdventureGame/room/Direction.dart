@@ -20,4 +20,6 @@ extension DirectionExtension on Direction {
       ..shuffle();
     return d;
   }
+
+  String toShortString() => toString().split('.').last;
 }
