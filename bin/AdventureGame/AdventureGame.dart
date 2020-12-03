@@ -12,19 +12,24 @@ import 'room/Room.dart';
 
 /// Contains the whole game
 class AdventureGame {
+  // default values
+  final INIT_LIFE = 200;
+  final INIT_STRENGTH = 70;
+  final INIT_GOLD = 0;
   final MAX_ROOM = 10;
   final Random r;
   final List<Direction> directions;
+
   // act as id for monster and item
   int counter = 0;
-  List<Player> players;
+  int playerCounter = 0;
+  Map<int, Player> players;
   Room startRoom;
 
-  AdventureGame():
-    r = Random(),
-    directions = <Direction>[]
-  {
-    players = <Player>[];
+  AdventureGame()
+      : r = Random(),
+        directions = <Direction>[] {
+    players = <int, Player>{};
     directions.add(Direction.NORTH);
     directions.add(Direction.EAST);
     directions.add(Direction.WEST);
@@ -48,13 +53,15 @@ class AdventureGame {
       oldRoom.neighbours.forEach((oldDir, current) {
         /// loop on each direction except the reverse of the current direction
         /// to not overwrite parent link
-        for (var newDir in oldDir.removeOpp(directions)) {
+        var d = [...directions];
+        for (var newDir in oldDir.removeOpp(d)) {
           if (nbRoom < MAX_ROOM) {
             /// by default there will always be 1 room then its random if there will be more
-            if(current.numberOfNeighbours() > 2 && r.nextBool()) {
+            if (current.numberOfNeighbours() > 2 && r.nextBool()) {
               continue;
             }
             newRoom = createRoom(nbRoom, level, newDir);
+
             /// two way - allow player to go back
             current.addNeighbours(newRoom, newDir);
             newRoom.addNeighbours(current, newDir.opposite());
@@ -67,10 +74,13 @@ class AdventureGame {
           }
         }
       });
+
       /// simple FIFO using queue
-      oldRoom = queue.first;
-      queue.removeFirst();
-      level++;
+      if (queue.isNotEmpty) {
+        oldRoom = queue.first;
+        queue.removeFirst();
+        level++;
+      }
     } while (queue.isNotEmpty);
   }
 
@@ -85,18 +95,17 @@ class AdventureGame {
     }
   }
 
-
   /*
   /// Recursive methode which generates dungeon
   /// Dart is not optimised for recursive even call tail
   /// Risk of memory heap due to large stack of call
   Room newRoom(Room currentRoom, Room oldRoom, Direction oldRoomDirection, int numberRoom) {
     for(var direction in directions) {
-      if(direction == oldRoomDirection) {
+      if (direction == oldRoomDirection) {
         currentRoom.addNeighbours(oldRoom, oldRoomDirection);
       }
       else if (numberRoom < MAX_ROOM) {
-        if(currentRoom.numberOfNeighbours() > 2 && r.nextBool()) {
+        if (currentRoom.numberOfNeighbours() > 2 && r.nextBool()) {
           continue;
         } else {
           final room = createRoom(numberRoom, direction);
@@ -121,8 +130,8 @@ class AdventureGame {
     // a room can have 1 to 3 items and mobs
     final n = r.nextInt(2) + 1;
     var room = Room('Room${direction.toShortString()}${roomNb}${level}');
-    for(var i = 0; i < n; i++) {
-      room.addMonster(createMob(level));
+    for (var i = 0; i < n; i++) {
+      room.addMonster(createMob(level), counter);
       room.addItem(createItem(level));
       counter++;
     }
@@ -154,10 +163,14 @@ class AdventureGame {
   Item createItem(int lvl) {
     final value = (40 * lvl) + 10;
     Item item;
-    switch(r.nextInt(3)) {
-      case 0 : item = LifePotion(value, counter); break;
-      case 1 : item =  StrengthPotion(value, counter);break;
-      case 2 :
+    switch (r.nextInt(3)) {
+      case 0:
+        item = LifePotion(value, counter);
+        break;
+      case 1:
+        item = StrengthPotion(value, counter);
+        break;
+      case 2:
         final cost = (2 * lvl) + 10;
         var bag = <Item>[];
         bag.add(LifePotion(value, counter));
@@ -169,9 +182,36 @@ class AdventureGame {
   }
 
   /// Add new player to the game
-  Map newPlayer(Player p) {
-    players.add(p);
+  Map newPlayer(int guid) {
+    var p = Player(
+        INIT_LIFE, INIT_STRENGTH, INIT_GOLD, 'player${playerCounter}', guid);
+    // add player to list of all players in game
+    players[guid] = p;
+    // put player to startRoom
+    startRoom.players[guid] = p;
+    // set player room to startRoom
     p.currentRoom = startRoom;
+    // increment player counter
+    playerCounter++;
+    // return player status
     return p.state();
+  }
+
+  /// Converts string to Direction object
+  ///
+  /// Accepts only "N" | "S" | "E" | "W"
+  /// else return null
+  Direction stringToDirection(String d) {
+    switch (d) {
+      case ('N'):
+        return directions[0];
+      case ('E'):
+        return directions[1];
+      case ('W'):
+        return directions[2];
+      case ('S'):
+        return directions[3];
+    }
+    return null;
   }
 }

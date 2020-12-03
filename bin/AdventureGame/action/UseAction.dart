@@ -12,14 +12,20 @@ class UseAction implements Action<Item> {
   String getType() => 'use';
 
   @override
-  bool isPossible(Player player) {
-    if(player.isDead()) {
-      return false;
+  Map isPossible(Player player) {
+    if (player.isDead()) {
+      return {
+        'bool': false,
+        'r': {'type': 'deadHandler'}
+      };
     }
-    if(player.currentRoom.items.isEmpty) {
-      return false;
+    if (player.currentRoom.items.isEmpty) {
+      return {
+        'bool': false,
+        'r': {'type': 'impossible', 'message': 'No more item in room'}
+      };
     }
-    return true;
+    return {'bool': true};
   }
 
   

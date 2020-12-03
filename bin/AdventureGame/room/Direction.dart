@@ -21,5 +21,5 @@ extension DirectionExtension on Direction {
     return d;
   }
 
-  String toShortString() => toString().split('.').last;
+  String toShortString() => toString().split('.').last[0];
 }

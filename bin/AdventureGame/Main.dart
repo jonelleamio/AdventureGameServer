@@ -1,15 +1,62 @@
-import 'AdventureGame.dart';
-import 'character/Player.dart';
+import 'dart:core';
 
-void main () {
-  const INIT_LIFE = 200;
-  const INIT_STRENGTH = 70;
-  const INIT_GOLD = 0;
-  var game = AdventureGame();
-  var player = Player(INIT_LIFE, INIT_STRENGTH, INIT_GOLD, 'player1', 123456789);
-  print(game.newPlayer(player));
-  print(player.currentRoom.state());
-  print(player.actions['move'].execute(player, player.currentRoom.getDirection().elementAt(0)));
-  print(player.actions['attack'].execute(player, player.currentRoom.monsters.first));
+// import 'AdventureGame.dart';
+
+void main() {
+  // var game = AdventureGame();
+  // todo : create console client
 }
 
+var entities = [123456789, 987654321];
+var items = [1, 2, 3, 4];
+
+// same as create new player
+Map connect() {
+  return {
+    'guid': 123,
+    'totalvie': 100,
+    'salle': {
+      'description': 'Vous êtes dans la première salle',
+      'passages': ['N', 'S', 'W'],
+      'entites': entities,
+      'items': items,
+    },
+  };
+}
+
+Map look(int guid) {
+  return {
+    'description':
+        "Vous êtes dans une salle depuis laquelle on ne peut pas se déplacer à l'ouest (testez pour déclancher une erreur)",
+    'passages': ['N', 'S', 'E'],
+    'entites': entities,
+    'items': items,
+  };
+}
+
+Map move(int guid, String direction) {
+  return {
+    'description': 'Vous êtes dans une autre salle',
+    'passages': ['N', 'S'],
+    'entites': entities,
+    'items': items,
+  };
+}
+
+Map examine(int guidSource, int guidDest) {
+  return {
+    'description': "L'utilisateur veut examiner",
+    'type': 'JOUEUR',
+    'vie': 98,
+    'totalvie': 100,
+  };
+}
+
+Map hit(int guidSource, int guidDest) {
+  return {
+    'description': "L'utilisateur veut taper",
+    'type': 'JOUEUR',
+    'vie': 98,
+    'totalvie': 100,
+  };
+}

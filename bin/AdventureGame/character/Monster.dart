@@ -5,12 +5,23 @@ class Monster extends Character {
       : super(life, strength, gold, name, guid, 'Monster');
 
   @override
+  String die() {
+    if (super.isDead()) {
+      return ' ${name} died in an agonising death and will haunt your soul forever.';
+    }
+    return '';
+  }
+
+  @override
   Map state() => {
         'type': type,
         'guid': guid,
-        'name': 'name',
+        'name': name,
         'life': life,
         'strength': strength,
         'gold': gold,
       };
+
+  @override
+  bool isMob() => true;
 }

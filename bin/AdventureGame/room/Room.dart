@@ -1,4 +1,3 @@
-import '../character/Character.dart';
 import '../character/Monster.dart';
 import '../character/Player.dart';
 import '../item/Item.dart';
@@ -6,18 +5,18 @@ import 'Direction.dart';
 
 class Room {
   final String name;
-  final List<Monster> monsters;
   final List<Item> items;
   final Map<Direction, Room> neighbours;
-  List<Player> players;
+  final Map<int, Monster> monsters;
+  final Map<int, Player> players;
 
   Room(this.name)
-      : monsters = <Monster>[],
+      : monsters = <int, Monster>{},
         items = <Item>[],
         neighbours = <Direction, Room>{},
-        players = <Player>[];
+        players = <int, Player>{};
 
-  void addMonster(Monster m) => monsters.add(m);
+  void addMonster(Monster m, int id) => monsters[id] = m;
 
   void addItem(Item i) => items.add(i);
 
@@ -33,15 +32,9 @@ class Room {
 
   bool isExit() => false;
 
-  List<int> getGuid(List<Character> list) {
-    var guids = <int>[];
-    list.forEach((c) => guids.add(c.guid));
-    return guids;
-  }
-
   List<int> getGuidEntities() {
-    var entities = getGuid(monsters);
-    if (players.isNotEmpty) entities.addAll(getGuid(players));
+    var entities = monsters.keys.toList();
+    if (players.isNotEmpty) entities.addAll(players.keys.toList());
     return entities;
   }
 

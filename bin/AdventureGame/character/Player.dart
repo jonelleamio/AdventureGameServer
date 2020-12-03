@@ -20,13 +20,24 @@ class Player extends Character {
   }
 
   @override
+  String die() {
+    if (super.isDead()) {
+      return ' ${name} died because of looserness. Player should never come back';
+    }
+    return '';
+  }
+
+  @override
   Map state() => {
         'type': type,
         'guid': guid,
-        'name': 'name',
+        'name': name,
         'life': life,
         'strength': strength,
         'gold': gold,
         'currentRoom': currentRoom.state()
       };
+
+  @override
+  bool isMob() => false;
 }
