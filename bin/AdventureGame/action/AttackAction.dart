@@ -11,8 +11,8 @@ class AttackAction implements Action<Character> {
       if (c.isMob()) {
         // mobs always attack back
         res = {
-          0: {...player.attack(c)},
-          1: {...c.attack(player)}
+          '0': {...player.attack(c)},
+          '1': {...c.attack(player)}
         };
         if (player.isDead()) {
           player.currentRoom.players.remove(player.guid);

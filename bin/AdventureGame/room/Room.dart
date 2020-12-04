@@ -5,20 +5,20 @@ import 'Direction.dart';
 
 class Room {
   final String name;
-  final List<Item> items;
   final Map<Direction, Room> neighbours;
+  final Map<int, Item> items;
   final Map<int, Monster> monsters;
   final Map<int, Player> players;
 
   Room(this.name)
       : monsters = <int, Monster>{},
-        items = <Item>[],
+        items = <int, Item>{},
         neighbours = <Direction, Room>{},
         players = <int, Player>{};
 
   void addMonster(Monster m, int id) => monsters[id] = m;
 
-  void addItem(Item i) => items.add(i);
+  void addItem(Item i, int id) => items[id] = i;
 
   void addNeighbours(Room r, Direction d) {
     if (!neighbours.containsKey(d)) neighbours[d] = r;
@@ -38,12 +38,6 @@ class Room {
     return entities;
   }
 
-  List<int> getItemsid() {
-    var iID = <int>[];
-    items.forEach((c) => iID.add(c.getId));
-    return iID;
-  }
-
   List<String> stringDirections() {
     final directions = getDirection();
     var result = <String>[];
@@ -58,6 +52,6 @@ class Room {
         'directions': stringDirections(),
         'totalEntities': players.length + monsters.length,
         'entities': getGuidEntities(),
-        'items': getItemsid()
+        'items': items.keys.toList()
       };
 }

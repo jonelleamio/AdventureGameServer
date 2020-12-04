@@ -132,7 +132,7 @@ class AdventureGame {
     var room = Room('Room${direction.toShortString()}${roomNb}${level}');
     for (var i = 0; i < n; i++) {
       room.addMonster(createMob(level), counter);
-      room.addItem(createItem(level));
+      room.addItem(createItem(level), counter);
       counter++;
     }
     return room;

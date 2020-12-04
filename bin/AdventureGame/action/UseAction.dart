@@ -5,7 +5,11 @@ import 'Action.dart';
 class UseAction implements Action<Item> {
   @override
   Map execute(Player player, item) {
-    item.isUsedBy(player);
+    var possible = isPossible(player);
+    if (possible['bool']) {
+      return item.isUsedBy(player);
+    }
+    return possible;
   }
 
   @override
@@ -27,6 +31,4 @@ class UseAction implements Action<Item> {
     }
     return {'bool': true};
   }
-
-  
 }

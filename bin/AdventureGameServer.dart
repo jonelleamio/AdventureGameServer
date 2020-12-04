@@ -18,6 +18,7 @@ final regarderUrl = UrlPattern(r'/(\d+)/regarder');
 final deplacementUrl = UrlPattern(r'/(\d+)/deplacement');
 final examinerUrl = UrlPattern(r'/(\d+)/examiner/(\d+)');
 final taperUrl = UrlPattern(r'/(\d+)/taper/(\d+)');
+final utiliserUrl = UrlPattern(r'/(\d+)/utiliser/(\d+)');
 
 // final allUrls = [homeUrl,connexionUrl,regarderUrl,deplacementUrl,examinerUrl,taperUrl];
 
@@ -34,6 +35,7 @@ Future main() async {
       ..serve(deplacementUrl, method: 'POST').listen(serverDeplacement)
       ..serve(examinerUrl, method: 'GET').listen(serverExaminer)
       ..serve(taperUrl, method: 'GET').listen(serverTaper)
+      ..serve(utiliserUrl, method: 'GET').listen(serverUtiliser)
       ..defaultStream.listen(noPostHandle);
     print('Listening on http://${server.address.address}:${server.port}/');
   });
@@ -52,6 +54,7 @@ void serverHome(HttpRequest request) {
         '  {"direction": "N" | "S" | "E" | "W"} '
         '- GET  <url>/<guidsource>/examiner/<guiddest> '
         '- POST <url>/<guidsource>/taper/<guidcible> '
+        '- POST <url>/<guidsource>/utiliser/<guidcible> '
         'Known errors '
         '- {"type": "NOTPLAYER", "message":".."} '
         '- {"type": "MORT", "message":".."} '
@@ -263,6 +266,7 @@ void serverTaper(HttpRequest request) {
     if (result['type' == 'deadHandler']) {
       print('<409> | #${sid} | player is dead');
       deadHandler(request);
+      return;
     }
   }
 
@@ -272,6 +276,57 @@ void serverTaper(HttpRequest request) {
     ..write(jsonEncode(result))
     ..close();
   print('<200> | #${sid} | #${did} | serverTaper');
+}
+
+void serverUtiliser(HttpRequest request) {
+  final sguid = (request.uri).toString().split('/')[1];
+  final dguid = (request.uri).toString().split('/')[3];
+  final sid = int.tryParse(sguid) ?? 0;
+  final did = int.tryParse(dguid) ?? 0;
+  print('#${sguid} tries to use #${dguid}');
+
+  // check if player exist else return error
+  if (isNotPlayer(sid)) {
+    print('<404> | #${sid} | is not a player');
+    notPlayerHandler(request);
+    return;
+  }
+
+  // get player from id
+  final player = GAME.players[sid];
+  var target;
+
+  // find target
+  if (player.currentRoom.items.containsKey(did)) {
+    target = player.currentRoom.items[did];
+  } else {
+    print('<409> | #${sid} | #${did} | Not same room');
+    sameRoomHandler(request);
+    return;
+  }
+
+  // target found execute look action
+  final result = player.actions['use'].execute(player, target);
+
+  // check if move action executed properly
+  if (result.containsKey('bool')) {
+    if (result['type'] == 'deadHandler') {
+      print('<409> | #${sid} | player is dead');
+      deadHandler(request);
+    }
+    if (result['type'] == 'impossible') {
+      print('<409> | #${sid} | ${result['message']}');
+      errorHandler(request, result['type'], result['message'], 409);
+    }
+    return;
+  }
+
+  request.response
+    ..statusCode = HttpStatus.ok
+    ..headers.contentType = ContentType.json
+    ..write(jsonEncode(result))
+    ..close();
+  print('<200> | #${sid} | #${did} | serverUtiliser');
 }
 
 void noPostHandle(HttpRequest request) {
