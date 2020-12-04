@@ -1,7 +1,7 @@
 library urls;
 
 import 'dart:async';
-import 'dart:convert' show jsonDecode, utf8;
+import 'dart:convert' show jsonDecode, jsonEncode, utf8;
 import 'dart:io';
 
 import 'package:route2/server.dart';
@@ -63,7 +63,8 @@ void serverHome(HttpRequest request) {
   };
   request.response
     ..statusCode = HttpStatus.ok
-    ..writeln(welcome)
+    ..headers.contentType = ContentType.json
+    ..write(jsonEncode(welcome))
     ..close();
   print('<200> serverHome');
 }
@@ -73,7 +74,8 @@ void serverConnect(HttpRequest request) {
   final guid = newUser();
   request.response
     ..statusCode = HttpStatus.created
-    ..writeln(GAME.newPlayer(guid))
+    ..headers.contentType = ContentType.json
+    ..write(jsonEncode(GAME.newPlayer(guid)))
     ..close();
   print('new player created | id:${guid}');
   print('<201> serverConnect');
@@ -95,7 +97,8 @@ void serverRegarder(HttpRequest request) {
 
   request.response
     ..statusCode = HttpStatus.ok
-    ..writeln(result)
+    ..headers.contentType = ContentType.json
+    ..write(jsonEncode(result))
     ..close();
   print('<200> | #${id} | serverRegarder');
 }
@@ -166,7 +169,8 @@ Future<void> serverDeplacement(HttpRequest request) async {
   // if everything gone good
   request.response
     ..statusCode = HttpStatus.ok
-    ..writeln(result)
+    ..headers.contentType = ContentType.json
+    ..write(jsonEncode(result))
     ..close();
   print('<200> | #${id} | serverDeplacement');
 }
@@ -216,7 +220,8 @@ void serverExaminer(HttpRequest request) {
 
   request.response
     ..statusCode = HttpStatus.ok
-    ..writeln(result)
+    ..headers.contentType = ContentType.json
+    ..write(jsonEncode(result))
     ..close();
   print('<200> | #${sid} | #${did} | serverExaminer');
 }
@@ -263,7 +268,8 @@ void serverTaper(HttpRequest request) {
 
   request.response
     ..statusCode = HttpStatus.ok
-    ..writeln(result)
+    ..headers.contentType = ContentType.json
+    ..write(jsonEncode(result))
     ..close();
   print('<200> | #${sid} | #${did} | serverTaper');
 }
@@ -271,7 +277,8 @@ void serverTaper(HttpRequest request) {
 void noPostHandle(HttpRequest request) {
   request.response
     ..statusCode = HttpStatus.badRequest
-    ..writeln({'error': 'Requette invalide !'})
+    ..headers.contentType = ContentType.json
+    ..write(jsonEncode({'error': 'Requette invalide !'}))
     ..close();
 }
 
@@ -330,61 +337,69 @@ Future<Map> getPostData(HttpRequest request) async {
 void notPlayerHandler(HttpRequest request) {
   request.response
     ..statusCode = HttpStatus.notFound
-    ..writeln({
+    ..headers.contentType = ContentType.json
+    ..write(jsonEncode({
       'type': 'NOTPLAYER',
       'message':
           'GUID inconnu, veuillez ecrire le bon id ou de créer un nouveau via /connect'
-    })
+    }))
     ..close();
 }
 
 void deadHandler(HttpRequest request) {
   request.response
     ..statusCode = HttpStatus.conflict
-    ..writeln({'type': 'MORT', 'message': 'Vous êtes mort (pas de bol)'})
+    ..headers.contentType = ContentType.json
+    ..write(
+        jsonEncode({'type': 'MORT', 'message': 'Vous êtes mort (pas de bol)'}))
     ..close();
 }
 
 void sameRoomHandler(HttpRequest request) {
   request.response
     ..statusCode = HttpStatus.conflict
-    ..writeln(
-        {'type': 'DIFFSALLE', 'message': "Vous n'êtes pas dans la même salle"})
+    ..headers.contentType = ContentType.json
+    ..write(jsonEncode(
+        {'type': 'DIFFSALLE', 'message': "Vous n'êtes pas dans la même salle"}))
     ..close();
 }
 
 void wallHandler(HttpRequest request) {
   request.response
     ..statusCode = HttpStatus.conflict
-    ..writeln({'type': 'MUR', 'message': 'Vous avez pris un mur'})
+    ..headers.contentType = ContentType.json
+    ..write(jsonEncode({'type': 'MUR', 'message': 'Vous avez pris un mur'}))
     ..close();
 }
 
 void wrongDirectionHandler(HttpRequest request, String d) {
   request.response
     ..statusCode = HttpStatus.conflict
-    ..writeln(
-        {'type': 'NOTDIRECTION', 'message': "La direction ${d} n'existe pas"})
+    ..headers.contentType = ContentType.json
+    ..write(jsonEncode(
+        {'type': 'NOTDIRECTION', 'message': "La direction ${d} n'existe pas"}))
     ..close();
 }
 
 void exitHandler(HttpRequest request) {
   request.response
     ..statusCode = HttpStatus.conflict
-    ..writeln({
+    ..headers.contentType = ContentType.json
+    ..write(jsonEncode({
       'type': 'EXIT',
       'message': 'Vous ne pouvez plus bouger, vous etes à la sortie !'
-    })
+    }))
     ..close();
 }
 
 void errorHandler(HttpRequest request, String type, String message, int code) {
   request.response
     ..statusCode = code
-    ..writeln({
+    ..headers.contentType = ContentType.json
+    ..write(jsonEncode({
       'type': type,
       'message': message,
-    })
+    }))
     ..close();
 }
 
